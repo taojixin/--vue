@@ -1,35 +1,53 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
-      <nav class="nav">
-        <a href="###">服装城</a>
-        <a href="###">美妆馆</a>
-        <a href="###">尚品汇超市</a>
-        <a href="###">全球购</a>
-        <a href="###">闪购</a>
-        <a href="###">团购</a>
-        <a href="###">有趣</a>
-        <a href="###">秒杀</a>
-      </nav>
-      <div class="sort">
-        <div class="all-sort-list2">
-          <div class="item" v-for="(c1) in categoryList" :key="c1.categoryId">
-            <h3>
-              <a href="">{{c1.categoryName}}</a>
-            </h3>
-            <div class="item-list clearfix">
-              <div class="subitem" v-for="c2 in c1.categoryChild" :key="c2.categoryId">
-                <dl class="fore">
-                  <dt>
-                    <a href="">{{c2.categoryName}}</a>
-                  </dt>
-                  <dd>
-                    <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
-                      <a href="">{{c3.categoryName}}</a>
-                    </em>
-                  </dd>
-                </dl>
+      <div @mouseenter="enterShow" @mouseleave="leaveShow">
+        <h2 class="all">全部商品分类</h2>
+        <nav class="nav">
+          <a href="###">服装城</a>
+          <a href="###">美妆馆</a>
+          <a href="###">尚品汇超市</a>
+          <a href="###">全球购</a>
+          <a href="###">闪购</a>
+          <a href="###">团购</a>
+          <a href="###">有趣</a>
+          <a href="###">秒杀</a>
+        </nav>
+        <div class="sort" v-show="show">
+          <div class="all-sort-list2" @click="goSearch">
+            <div class="item" v-for="c1 in categoryList" :key="c1.categoryId">
+              <h3>
+                <a
+                  :data-categoryName="c1.categoryName"
+                  :data-category1Id="c1.categoryId"
+                  >{{ c1.categoryName }}</a
+                >
+              </h3>
+              <div class="item-list clearfix">
+                <div
+                  class="subitem"
+                  v-for="c2 in c1.categoryChild"
+                  :key="c2.categoryId"
+                >
+                  <dl class="fore">
+                    <dt>
+                      <a
+                        :data-categoryName="c2.categoryName"
+                        :data-category1Id="c2.categoryId"
+                        >{{ c2.categoryName }}</a
+                      >
+                    </dt>
+                    <dd>
+                      <em v-for="c3 in c2.categoryChild" :key="c3.categoryId">
+                        <a
+                          :data-categoryName="c3.categoryName"
+                          :data-category1Id="c3.categoryId"
+                          >{{ c3.categoryName }}</a
+                        >
+                      </em>
+                    </dd>
+                  </dl>
+                </div>
               </div>
             </div>
           </div>
@@ -40,19 +58,59 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import { mapState } from "vuex";
 export default {
   name: "TypeNav",
+  data() {
+    return {
+      show: true,
+    };
+  },
   // 组件挂载完毕：可以项服务器发送请求
   mounted() {
-    // 通过Vuex发送请求， 获取数据，存储于仓库中
-    this.$store.dispatch('categoryList');
+    // 当组件挂载完毕，让show属性变为false
+    if (this.$route.path != "/home") {
+      this.show = false;
+    }
   },
   computed: {
     ...mapState({
-      categoryList: state => state.home.categoryList
-    })
-  }
+      categoryList: (state) => state.home.categoryList,
+    }),
+  },
+  methods: {
+    goSearch(event) {
+      let element = event.target;
+      let { categoryname, category1id, category2id, category3id } =
+        element.dataset;
+      if (categoryname) {
+        let location = { name: "search" };
+        let query = { categoryName: categoryname };
+        if (category1id) {
+          query.category1id = category1id;
+        } else if (category2id) {
+          query.category2id = category2id;
+        } else {
+          query.category3id = category3id;
+        }
+        if (this.$route.params) {
+          location.params = this.$route.params;
+          location.query = query;
+          this.$router.push(location);
+        }
+      }
+    },
+    // 当鼠标移入的时候商品分类列表展示
+    enterShow() {
+      this.show = true;
+    },
+    // 鼠标移开时隐藏
+    leaveShow() {
+      if (this.$route.path != "/home") {
+        this.show = false;
+      }
+    },
+  },
 };
 </script>
 

@@ -11,7 +11,6 @@
             <!-- 声明式导航 -->
             <router-link to="/login">登录</router-link>
             <router-link class="register" to="/register">免费注册</router-link>
-            
           </p>
         </div>
         <div class="typeList">
@@ -31,7 +30,7 @@
       <h1 class="logoArea">
         <router-link class="logo" to="/home">
           <img src="./images/logo.png" alt="" />
-        </router-link >
+        </router-link>
       </h1>
       <div class="searchArea">
         <form action="###" class="searchForm">
@@ -40,7 +39,11 @@
             id="autocomplete"
             class="input-error input-xxlarge"
           />
-          <button class="sui-btn btn-xlarge btn-danger" type="button" @click="goSearch">
+          <button
+            class="sui-btn btn-xlarge btn-danger"
+            type="button"
+            @click="goSearch"
+          >
             搜索
           </button>
         </form>
@@ -54,7 +57,11 @@ export default {
   methods: {
     // 搜索按钮的回调函数
     goSearch() {
-      this.$router.push('/search')
+      if(this.$route.query) {
+        let loction = {name:"search", params: {keyword:this.keyword || undefined}}
+        location.query = this.$route.query;
+        this.$$router.push(loction)
+      }
     }
   }
 };
